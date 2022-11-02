@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections;
+using System.Globalization;
 using static System.Console;
 
 
@@ -9,7 +10,6 @@ internal class Program
         int i = 0;
         List<string> names = new List<string>() { "Суслов", "Иванов", "Петров", "Агатис", "Берия" };
         sortEventClass sortEventClass = new sortEventClass();
-
         while (i != 1 & i != 2)
         {
             try
@@ -19,20 +19,34 @@ internal class Program
                 if (!(i == 1) & !(i == 2)) throw new ExceptionExtension("Введённое число не соответствует вариантам сортировки");
                 else
                 {
-                    sortEventClass.SortSwitch(names, i);
+                    switch (i)
+                    {
+                        case 1:
+                            sortEventClass.SortEvent += sortEventClass.SortAsc;
+                            break;
+                        case 2:
+                            sortEventClass.SortEvent += sortEventClass.SortDec;
+                            break;
+                    }
+                    sortEventClass.SortEventMethod(names);
+
+                    foreach(var name in names)
+                    {
+                        WriteLine(name);
+                    }
                 }
             }
             catch (System.FormatException)
             {
-                Console.WriteLine("Введенно некоректное значение");
+                WriteLine("Введенно некоректное значение");
             }
             catch (ExceptionExtension ex)
             {
-                Console.WriteLine(ex.Message);
+                WriteLine(ex.Message);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                WriteLine(ex.ToString());
             }
         }
     }
@@ -44,46 +58,29 @@ class ExceptionExtension : Exception
     public ExceptionExtension(string name) : base(name)
     { }
 }
-
 class sortEventClass
 {
-    public delegate void SortDelegate();
+    public delegate void SortDelegate(List<string> namesList);
     public event SortDelegate? SortEvent;
-    public void SortSwitch(List<string> namesList, int i)
+    public void SortEventMethod(List<string> namesList)
     {
-        switch (i)
-        {
-            case 1:
-                SortEventMethod(namesList);
-                break;
-            case 2:
-                SortEventMethod(namesList);
-                break;
-        }
-    }
-    protected void SortEventMethod(List<string> namesList)
-    {
-        SortEvent?.Invoke();
+        SortEvent?.Invoke(namesList);
     }
     /// <summary>
     /// Сортировка [A-Я]
     /// </summary>
     /// <param name="namesList"></param>
-    public void SortAsc(List<string> namesList) { }
+    public void SortAsc(List<string> namesList)
+    {
+        namesList.Sort();
+    }
     /// <summary>
     /// Сортировка [Я-А]
     /// </summary>
     /// <param name="namesList"></param>
-    public void SortDec(List<string> namesList) { }
-
-    /// <summary>
-    /// Сортировка [A-Я]
-    /// </summary>
-    /// <param name="namesList"></param>
-    public void SortAsc() { }
-    /// <summary>
-    /// Сортировка [Я-А]
-    /// </summary>
-    /// <param name="namesList"></param>
-    public void SortDec() { }
+    public void SortDec(List<string> namesList)
+    {
+        namesList.Sort();
+        namesList.Reverse();
+    }
 }
